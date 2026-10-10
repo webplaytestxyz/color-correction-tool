@@ -9,15 +9,15 @@ def resource_path(relative_path):
     base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
     return os.path.join(base_path, relative_path)
 
-def deorange_full_image(img):
-    print("✨ Doing de-orange magic, just a sec...")
+def correct_color_cast(img):
+    print("✨ Processing image, just a sec...")
     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     L, A, B = cv2.split(lab)
 
     mean_A = np.mean(A)
     mean_B = np.mean(B)
     
-    # Subtract a fraction of the difference to neutralize orange tint
+    # Subtract a fraction of the difference to neutralize color cast
     B_new = cv2.subtract(B, int((mean_B - 128) * 0.3))
     A_new = cv2.subtract(A, int((mean_A - 128) * 0.1))
 
@@ -27,7 +27,7 @@ def deorange_full_image(img):
     lab_corrected = cv2.merge([L, A_new, B_new])
     corrected_img = cv2.cvtColor(lab_corrected, cv2.COLOR_LAB2BGR)
 
-    print("✅ De-Orange - orange tint corrected!")
+    print("✅ Color correction complete!")
     return corrected_img
 
 def plot_histograms(input_img, output_img, save_path):
@@ -73,7 +73,7 @@ def process_current_folder():
     for img_name in images:
         base_name, ext = os.path.splitext(img_name)
         input_path = os.path.join(current_folder, img_name)
-        output_img_name = f"{base_name}_deoranged{ext}"
+        output_img_name = f"{base_name}_corrected{ext}"
         output_path = os.path.join(output_folder, output_img_name)
 
         print(f"\n➡️ Processing: {img_name}")
@@ -82,13 +82,13 @@ def process_current_folder():
             print(f"⚠️ Could not read {img_name}, skipping.")
             continue
 
-        corrected_img = deorange_full_image(img.copy())
+        corrected_img = correct_color_cast(img.copy())
         if cv2.imwrite(output_path, corrected_img):
             print(f"🎉 Saved corrected image: {output_path}")
         else:
             print(f"❌ Failed to save {img_name}")
 
-        hist_path = os.path.join(output_folder, f"{base_name}_deoranged_histogram.png")
+        hist_path = os.path.join(output_folder, f"{base_name}_corrected_histogram.png")
         plot_histograms(img, corrected_img, hist_path)
 
     print("\n🚀 All done! Press Enter to exit.")
