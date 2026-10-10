@@ -17,7 +17,7 @@ No Photoshop, no learning curve. Just drop in a folder and get clean, natural-lo
 
 ### 🖼️ Example: Before and After
 
-![Before and After](DeOrangeExample.png)
+![Before and After](color-correction-tool.png)
 
 ---
 
